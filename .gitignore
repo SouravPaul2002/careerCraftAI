@@ -1,0 +1,21 @@
+# Environment variables (never commit secrets or DB passwords)
+.env
+*.env.local
+
+# Python virtual environments & cache
+myenv/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+
+# Storage / temporary files
+storage/uploads/*
+storage/generated/*
+storage/temp/*
+storage/chroma/
+

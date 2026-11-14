@@ -1,0 +1,4 @@
+python-interpreter-path = "backend/myenv/Scripts/python.exe"
+search-path = ["backend"]
+project-excludes = ["backend/myenv/**", "frontend/**", "**/__pycache__/**"]
+

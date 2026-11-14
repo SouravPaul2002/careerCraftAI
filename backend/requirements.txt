@@ -1,0 +1,41 @@
+# Web framework & server
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+email-validator
+python-dotenv
+python-multipart
+
+# Database (PostgreSQL + SQLAlchemy)
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Authentication & HTTP requests
+pyjwt
+bcrypt
+authlib
+httpx
+
+# AI agents & LLM
+langchain
+langgraph
+langchain-google-genai
+langsmith
+
+langchain-text-splitters
+
+# Vector database & document parsing
+chromadb
+pypdf
+python-docx
+beautifulsoup4
+
+# MCP & templates
+mcp
+jinja2
+
+# Testing
+pytest
+pytest-asyncio
