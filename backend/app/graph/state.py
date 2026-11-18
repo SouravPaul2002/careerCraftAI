@@ -1,0 +1,30 @@
+from typing import TypedDict, Any
+
+
+class AgentGraphState(TypedDict):
+    """Shared state dictionary passed across all nodes in the LangGraph workflow."""
+
+    # Inputs provided by user
+    user_id: int
+    job_raw_text: str
+    hint_title: str | None
+    hint_company: str | None
+
+    # Branch 1 Output: Job Analysis Agent
+    job_analysis: dict[str, Any] | None #Stores extracted job title, required skills, preferred skills, responsibilities
+
+    # Branch 2 Output: Candidate Profile Agent
+
+    # Stores candidate's full skills, experience, and repositories from PostgreSQL
+    candidate_profile: dict[str, Any] | None
+    # Stores candidate's strengths and domain summary
+    candidate_analysis: dict[str, Any] | None
+
+    # Join Output: Supervisor Agent
+
+    # Stores matched skills, skill gaps, fit score (%), and resume strategy
+    supervisor_evaluation: dict[str, Any] | None
+
+    # Graph execution status & error tracking
+    status: str
+    errors: list[str]
