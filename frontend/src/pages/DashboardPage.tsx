@@ -3,6 +3,7 @@ import { GitHubCard } from '../components/GitHubCard';
 import { GoogleDriveCard } from '../components/GoogleDriveCard';
 import { JobDescriptionCard } from '../components/JobDescriptionCard';
 import { KnowledgeBaseCard } from '../components/KnowledgeBaseCard';
+import { OrchestratorCard } from '../components/OrchestratorCard';
 import { useAuth } from '../hooks/useAuth';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 
@@ -42,6 +43,8 @@ export function DashboardPage() {
       <KnowledgeBaseCard />
 
       <JobDescriptionCard />
+
+      <OrchestratorCard />
 
       <section className="cards-grid" style={{ marginTop: '1.5rem' }}>
         <div className="info-card">

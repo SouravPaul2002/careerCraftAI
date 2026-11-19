@@ -1,4 +1,5 @@
-from typing import TypedDict, Any
+from typing import Any
+from typing_extensions import TypedDict
 
 
 class AgentGraphState(TypedDict):
