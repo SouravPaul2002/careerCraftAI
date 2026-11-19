@@ -4,6 +4,11 @@ from typing import Any, Union
 import httpx
 from langchain_groq import ChatGroq
 
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except ImportError:
+    ChatGoogleGenerativeAI = None  # type: ignore
+
 from app.config.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -84,11 +89,18 @@ class OllamaChat:
         return OllamaResponse(content=text)
 
 
-def pick_llm(level: str = "medium") -> Union[ChatGroq, OllamaChat]:
+def pick_llm(
+    level: str = "medium",
+    provider: str | None = None,
+) -> Union[Any, ChatGroq, OllamaChat]:
     """Pick LLM instance with temperature tuned for task complexity.
 
-    If GROQ_API_KEY is configured in .env, returns high-speed ChatGroq.
-    Otherwise, falls back to local Ollama.
+    Supports Google Gemini (via ChatGoogleGenerativeAI), Groq Cloud (via ChatGroq),
+    and local Ollama.
+    Selection order in 'auto' mode:
+    1. Gemini (if GEMINI_API_KEY is configured)
+    2. Groq (if GROQ_API_KEY is configured)
+    3. Local Ollama (fallback)
     """
     level = level.strip().lower()
 
@@ -102,16 +114,61 @@ def pick_llm(level: str = "medium") -> Union[ChatGroq, OllamaChat]:
         raise ValueError("level must be 'low', 'medium', or 'high'")
 
     temperature = temp_map[level]
+    target_provider = (provider or settings.LLM_PROVIDER or "auto").strip().lower()
 
-    # Prioritize Groq Cloud if API key is provided
-    groq_api_key = settings.GROQ_API_KEY.strip()
-    if groq_api_key:
+    gemini_key = settings.GEMINI_API_KEY.strip()
+    groq_key = settings.GROQ_API_KEY.strip()
+
+    # Explicit Gemini selection
+    if target_provider == "gemini":
+        if not gemini_key:
+            logger.warning("LLM provider 'gemini' requested but GEMINI_API_KEY is missing. Falling back to Groq/Ollama.")
+        elif ChatGoogleGenerativeAI is None:
+            logger.warning("langchain_google_genai is not installed. Falling back to Groq/Ollama.")
+        else:
+            model_name = settings.GEMINI_MODEL.strip() or "gemini-2.5-flash"
+            return ChatGoogleGenerativeAI(
+                model=model_name,
+                google_api_key=gemini_key,
+                temperature=temperature,
+                api_version="v1beta",
+            )
+
+    # Explicit Groq selection
+    if target_provider == "groq":
+        if not groq_key:
+            logger.warning("LLM provider 'groq' requested but GROQ_API_KEY is missing. Falling back.")
+        else:
+            model_name = settings.GROQ_MODEL.strip() or "qwen/qwen3.8-27b"
+            return ChatGroq(
+                model_name=model_name,
+                groq_api_key=groq_key,
+                temperature=temperature,
+            )
+
+    # Explicit Ollama selection
+    if target_provider == "ollama":
+        return OllamaChat(temperature=temperature)
+
+    # Auto mode resolution:
+    # 1. Gemini Cloud if configured
+    if gemini_key and ChatGoogleGenerativeAI is not None:
+        model_name = settings.GEMINI_MODEL.strip() or "gemini-2.5-flash"
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            google_api_key=gemini_key,
+            temperature=temperature,
+            api_version="v1beta",
+        )
+
+    # 2. Groq Cloud if configured
+    if groq_key:
         model_name = settings.GROQ_MODEL.strip() or "qwen/qwen3.8-27b"
         return ChatGroq(
             model_name=model_name,
-            groq_api_key=groq_api_key,
+            groq_api_key=groq_key,
             temperature=temperature,
         )
 
-    # Fallback to local Ollama
+    # 3. Local Ollama fallback
     return OllamaChat(temperature=temperature)

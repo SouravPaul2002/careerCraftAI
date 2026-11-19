@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "qwen/qwen3.8-27b"
 
+    # Google Gemini API settings
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+
+    # LLM provider: 'auto', 'gemini', 'groq', 'ollama'
+    LLM_PROVIDER: str = "auto"
+
     # Optional custom path for ChromaDB persistence
     CHROMA_PERSIST_DIR: str = ""
 
