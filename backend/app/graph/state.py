@@ -26,6 +26,16 @@ class AgentGraphState(TypedDict):
     # Stores matched skills, skill gaps, fit score (%), and resume strategy
     supervisor_evaluation: dict[str, Any] | None
 
+    # Application Generation Agent
+    generated_application: dict[str, Any] | None
+    application_id: int | None
+
+    # LLM Judge & ReAct Revision
+    judge_evaluation: dict[str, Any] | None
+    revision_count: int
+    human_feedback: str | None
+    human_approved: bool
+
     # Graph execution status & error tracking
     status: str
     errors: list[str]

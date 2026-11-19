@@ -1,5 +1,5 @@
 /**
- * API service for triggering the LangGraph Multi-Agent Orchestrator.
+ * API service for triggering and resuming the LangGraph Multi-Agent Orchestrator.
  */
 import type { OrchestratorRunRequest, OrchestratorRunResponse } from '../types/orchestrator';
 
@@ -17,6 +17,12 @@ async function parseError(response: Response, fallback: string): Promise<string>
   return fallback;
 }
 
+export interface OrchestratorResumeRequest {
+  thread_id: string;
+  action: 'approve' | 'request_changes';
+  feedback?: string;
+}
+
 export async function runOrchestrator(
   token: string,
   payload: OrchestratorRunRequest
@@ -32,6 +38,26 @@ export async function runOrchestrator(
 
   if (!response.ok) {
     throw new Error(await parseError(response, 'Failed to run multi-agent orchestrator'));
+  }
+
+  return response.json();
+}
+
+export async function resumeOrchestrator(
+  token: string,
+  payload: OrchestratorResumeRequest
+): Promise<OrchestratorRunResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/orchestrator/resume`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response, 'Failed to resume orchestrator workflow'));
   }
 
   return response.json();

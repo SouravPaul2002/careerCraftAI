@@ -49,7 +49,7 @@ def run_supervisor_agent(
     llm = pick_llm("medium")
     parser = PydanticOutputParser(pydantic_object=SupervisorEvaluationOutput)
 
-    def call_llm(prompt_value) -> str:
+    def call_llm(prompt_value) -> list[dict[Any, Any] | str] | str:
         """Send formatted prompt to Ollama and return text content."""
         return llm.invoke(prompt_value).content
 

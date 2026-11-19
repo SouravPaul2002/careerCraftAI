@@ -113,7 +113,9 @@ async def test_graph_parallel_execution_mocked():
     with patch("app.graph.nodes.run_job_analysis_agent") as mock_job, \
          patch("app.graph.nodes.Session") as mock_session_cls, \
          patch("app.graph.nodes.run_candidate_analysis_agent") as mock_cand, \
-         patch("app.graph.nodes.run_supervisor_agent") as mock_sup:
+         patch("app.graph.nodes.run_supervisor_agent") as mock_sup, \
+         patch("app.graph.nodes.run_application_generation_agent") as mock_gen, \
+         patch("app.graph.nodes.run_judge_agent") as mock_judge:
 
         mock_job.return_value = MagicMock(
             model_dump=lambda: {"job_title": "Backend AI Developer", "required_skills": ["Python"]}
@@ -123,6 +125,12 @@ async def test_graph_parallel_execution_mocked():
         )
         mock_sup.return_value = MagicMock(
             model_dump=lambda: {"fit_score": 95, "matched_skills": ["Python"]}
+        )
+        mock_gen.return_value = MagicMock(
+            model_dump=lambda: {"resume": {}, "cover_letter": {}}
+        )
+        mock_judge.return_value = MagicMock(
+            model_dump=lambda: {"decision": "APPROVED", "overall_score": 90}
         )
 
         mock_db = MagicMock()
