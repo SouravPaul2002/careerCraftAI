@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # Local Ollama server URL
     OLLAMA_BASE_URL: str = "http://localhost:11434"
 
+    # Groq Cloud API settings
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
+
     # Optional custom path for ChromaDB persistence
     CHROMA_PERSIST_DIR: str = ""
 

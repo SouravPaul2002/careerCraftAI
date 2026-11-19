@@ -1,8 +1,12 @@
-from typing import Any
+import logging
+from typing import Any, Union
 
 import httpx
+from langchain_groq import ChatGroq
 
 from app.config.settings import settings
+
+logger = logging.getLogger(__name__)
 
 
 class OllamaResponse:
@@ -80,15 +84,34 @@ class OllamaChat:
         return OllamaResponse(content=text)
 
 
-def pick_llm(level: str = "medium") -> OllamaChat:
-    """Pick LLM instance with temperature tuned for task complexity."""
+def pick_llm(level: str = "medium") -> Union[ChatGroq, OllamaChat]:
+    """Pick LLM instance with temperature tuned for task complexity.
+
+    If GROQ_API_KEY is configured in .env, returns high-speed ChatGroq.
+    Otherwise, falls back to local Ollama.
+    """
     level = level.strip().lower()
 
-    if level == "low":
-        return OllamaChat(temperature=0.1)
-    elif level == "medium":
-        return OllamaChat(temperature=0.3)
-    elif level == "high":
-        return OllamaChat(temperature=0.5)
-    else:
+    # Temperature mapping based on reasoning level
+    temp_map = {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5,
+    }
+    if level not in temp_map:
         raise ValueError("level must be 'low', 'medium', or 'high'")
+
+    temperature = temp_map[level]
+
+    # Prioritize Groq Cloud if API key is provided
+    groq_api_key = settings.GROQ_API_KEY.strip()
+    if groq_api_key:
+        model_name = settings.GROQ_MODEL.strip() or "qwen/qwen3.8-27b"
+        return ChatGroq(
+            model_name=model_name,
+            groq_api_key=groq_api_key,
+            temperature=temperature,
+        )
+
+    # Fallback to local Ollama
+    return OllamaChat(temperature=temperature)

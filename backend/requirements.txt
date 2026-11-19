@@ -22,6 +22,7 @@ httpx
 langchain
 langgraph
 langchain-google-genai
+langchain-groq
 langsmith
 
 langchain-text-splitters
