@@ -1,0 +1,80 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.6in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[scaled=0.92]{helvet}
+\renewcommand\familydefault{\sfdefault}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdfpagemode=FullScreen,
+}
+
+\pagestyle{empty}
+\setlist[itemize]{leftmargin=12pt,itemsep=1.5pt,topsep=1.5pt}
+
+\newcommand{\minsection}[1]{%
+    \vspace{6pt}%
+    \noindent\textbf{\large #1}\\[-6pt]%
+    \noindent\rule{\linewidth}{0.6pt}\par\vspace{3pt}%
+}
+
+\begin{document}
+
+% Header
+\noindent{\LARGE \textbf{\VAR{header.full_name | latex_escape}}} \hfill \small{\BLOCK{if header.email}\href{mailto:\VAR{header.email}}{\VAR{header.email | latex_escape}}\BLOCK{endif} \BLOCK{if header.phone}$\cdot$ \VAR{header.phone | latex_escape}\BLOCK{endif}} \\
+\noindent\small{\BLOCK{if header.location}\VAR{header.location | latex_escape}\BLOCK{endif}} \hfill \small{\BLOCK{if header.linkedin_url}\href{\VAR{header.linkedin_url}}{LinkedIn} $\cdot$ \BLOCK{endif}\BLOCK{if header.github_url}\href{\VAR{header.github_url}}{GitHub}\BLOCK{endif}}
+\vspace{2pt}
+
+% Summary
+\BLOCK{if professional_summary}
+\minsection{SUMMARY}
+\noindent\small{\VAR{professional_summary | latex_escape}}
+\BLOCK{endif}
+
+% Skills
+\BLOCK{if skills}
+\minsection{SKILLS}
+\BLOCK{for category, skill_list in skills.items()}
+\noindent\textbf{\VAR{category | latex_escape}:} \VAR{skill_list | join(", ") | latex_escape} \\
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% Experience
+\BLOCK{if work_experience}
+\minsection{EXPERIENCE}
+\BLOCK{for exp in work_experience}
+\noindent\textbf{\VAR{exp.role | latex_escape}} $\vert$ \textit{\VAR{exp.company | latex_escape}} \hfill \small{\VAR{exp.duration | default('') | latex_escape}}
+\begin{itemize}
+\BLOCK{for bullet in exp.bullet_points}
+    \item \VAR{bullet | latex_escape}
+\BLOCK{endfor}
+\end{itemize}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% Projects
+\BLOCK{if selected_projects}
+\minsection{PROJECTS}
+\BLOCK{for proj in selected_projects}
+\noindent\textbf{\VAR{proj.name | latex_escape}} \BLOCK{if proj.technologies}\textit{(\VAR{proj.technologies | join(", ") | latex_escape})}\BLOCK{endif} \BLOCK{if proj.repo_url}\hfill \small{\href{\VAR{proj.repo_url}}{[Code]}}\BLOCK{endif}
+\begin{itemize}
+\BLOCK{for bullet in proj.bullet_points}
+    \item \VAR{bullet | latex_escape}
+\BLOCK{endfor}
+\end{itemize}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% Education
+\BLOCK{if education}
+\minsection{EDUCATION}
+\BLOCK{for edu in education}
+\noindent\textbf{\VAR{edu.degree | latex_escape}}, \textit{\VAR{edu.institution | latex_escape}} \hfill \small{\VAR{edu.year | default('') | latex_escape}} \\
+\BLOCK{endfor}
+\BLOCK{endif}
+
+\end{document}

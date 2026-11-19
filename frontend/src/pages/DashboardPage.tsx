@@ -1,4 +1,5 @@
 import { DiscoveryCard } from '../components/DiscoveryCard';
+import { DocumentStudioCard } from '../components/DocumentStudioCard';
 import { GitHubCard } from '../components/GitHubCard';
 import { GoogleDriveCard } from '../components/GoogleDriveCard';
 import { JobDescriptionCard } from '../components/JobDescriptionCard';
@@ -45,6 +46,8 @@ export function DashboardPage() {
       <JobDescriptionCard />
 
       <OrchestratorCard />
+
+      <DocumentStudioCard />
 
       <section className="cards-grid" style={{ marginTop: '1.5rem' }}>
         <div className="info-card">

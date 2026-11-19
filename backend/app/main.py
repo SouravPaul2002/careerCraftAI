@@ -14,6 +14,7 @@ from app.api.routes.jobs import router as jobs_router
 from app.api.routes.knowledge import router as knowledge_router
 from app.api.routes.orchestrator import router as orchestrator_router
 from app.api.routes.mcp import router as mcp_router
+from app.api.routes.latex import router as latex_router
 from app.config.settings import settings
 from app.database.connection import create_tables
 from app.database.session import get_db
@@ -50,6 +51,7 @@ app.include_router(knowledge_router)
 app.include_router(jobs_router)
 app.include_router(orchestrator_router)
 app.include_router(mcp_router)
+app.include_router(latex_router)
 
 
 @app.get("/")

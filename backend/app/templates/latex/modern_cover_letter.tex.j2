@@ -1,0 +1,62 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{lmodern}
+\usepackage{parskip}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+}
+
+\pagestyle{empty}
+
+\begin{document}
+
+% Modern Header
+\begin{center}
+    {\Huge \bfseries \VAR{candidate_name | latex_escape}} \\[6pt]
+    \small
+    \BLOCK{if contact.location}\VAR{contact.location | latex_escape} $\cdot$ \BLOCK{endif}
+    \BLOCK{if contact.email}\href{mailto:\VAR{contact.email}}{\VAR{contact.email | latex_escape}} $\cdot$ \BLOCK{endif}
+    \BLOCK{if contact.phone}\VAR{contact.phone | latex_escape}\BLOCK{endif}
+\end{center}
+
+\vspace{-4pt}
+\noindent\rule{\linewidth}{0.8pt}
+\vspace{12pt}
+
+% Metadata
+\noindent\today \hfill \textbf{Position: \VAR{target_role | latex_escape}} \\[4pt]
+\BLOCK{if company_name}\noindent\textit{Target Organization:} \textbf{\VAR{company_name | latex_escape}} \\[12pt] \BLOCK{endif}
+
+% Salutation
+\noindent \VAR{salutation | default('Dear Hiring Team,') | latex_escape}
+
+\vspace{8pt}
+
+% Opening
+\noindent \VAR{opening_paragraph | latex_escape}
+
+% Body
+\BLOCK{for p in body_paragraphs}
+\vspace{8pt}
+\noindent \VAR{p | latex_escape}
+\BLOCK{endfor}
+
+% Closing
+\BLOCK{if closing_paragraph}
+\vspace{8pt}
+\noindent \VAR{closing_paragraph | latex_escape}
+\BLOCK{endif}
+
+\vspace{16pt}
+
+% Sign-off
+\noindent \VAR{sign_off | default('Sincerely,') | latex_escape} \\[28pt]
+\noindent \textbf{\VAR{candidate_name | latex_escape}}
+
+\end{document}

@@ -1,0 +1,96 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{lmodern}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdfpagemode=FullScreen,
+}
+
+\pagestyle{empty}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+
+\setlist[itemize]{leftmargin=*,itemsep=1.5pt,topsep=1.5pt}
+
+\begin{document}
+
+% Header
+\begin{center}
+    {\Huge \bfseries \VAR{header.full_name | latex_escape}} \\[4pt]
+    \small
+    \BLOCK{if header.location}\VAR{header.location | latex_escape} $\cdot$ \BLOCK{endif}
+    \BLOCK{if header.email}\href{mailto:\VAR{header.email}}{\VAR{header.email | latex_escape}} $\cdot$ \BLOCK{endif}
+    \BLOCK{if header.phone}\VAR{header.phone | latex_escape}\BLOCK{endif}
+    \BLOCK{if header.linkedin_url or header.github_url or header.portfolio_url} \\[2pt] \BLOCK{endif}
+    \BLOCK{if header.linkedin_url}\href{\VAR{header.linkedin_url}}{LinkedIn} $\cdot$ \BLOCK{endif}
+    \BLOCK{if header.github_url}\href{\VAR{header.github_url}}{GitHub} $\cdot$ \BLOCK{endif}
+    \BLOCK{if header.portfolio_url}\href{\VAR{header.portfolio_url}}{Portfolio}\BLOCK{endif}
+\end{center}
+
+\vspace{-4pt}
+
+% Professional Summary
+\BLOCK{if professional_summary}
+\section{Professional Summary}
+\small{\VAR{professional_summary | latex_escape}}
+\BLOCK{endif}
+
+% Technical Skills
+\BLOCK{if skills}
+\section{Technical Skills}
+\begin{itemize}[leftmargin=*,itemsep=1pt,topsep=1pt]
+\BLOCK{for category, skill_list in skills.items()}
+    \item \textbf{\VAR{category | latex_escape}:} \VAR{skill_list | join(", ") | latex_escape}
+\BLOCK{endfor}
+\end{itemize}
+\BLOCK{endif}
+
+% Work Experience
+\BLOCK{if work_experience}
+\section{Work Experience}
+\BLOCK{for exp in work_experience}
+\noindent\textbf{\VAR{exp.role | latex_escape}} \hfill \small{\VAR{exp.duration | default('') | latex_escape}} \\
+\textit{\VAR{exp.company | latex_escape}} \BLOCK{if exp.location}\hfill \small{\textit{\VAR{exp.location | latex_escape}}}\BLOCK{endif}
+\begin{itemize}
+\BLOCK{for bullet in exp.bullet_points}
+    \item \VAR{bullet | latex_escape}
+\BLOCK{endfor}
+\end{itemize}
+\vspace{2pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% Projects
+\BLOCK{if selected_projects}
+\section{Selected Projects}
+\BLOCK{for proj in selected_projects}
+\noindent\textbf{\VAR{proj.name | latex_escape}} \BLOCK{if proj.technologies}\textit{| \VAR{proj.technologies | join(", ") | latex_escape}}\BLOCK{endif} \BLOCK{if proj.repo_url}\hfill \small{\href{\VAR{proj.repo_url}}{[Link]}}\BLOCK{endif}
+\begin{itemize}
+\BLOCK{for bullet in proj.bullet_points}
+    \item \VAR{bullet | latex_escape}
+\BLOCK{endfor}
+\end{itemize}
+\vspace{2pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% Education
+\BLOCK{if education}
+\section{Education}
+\BLOCK{for edu in education}
+\noindent\textbf{\VAR{edu.institution | latex_escape}} \hfill \small{\VAR{edu.year | default('') | latex_escape}} \\
+\textit{\VAR{edu.degree | latex_escape}} \BLOCK{if edu.grade_or_cgpa}\hfill \small{CGPA/Grade: \VAR{edu.grade_or_cgpa | latex_escape}}\BLOCK{endif}
+\vspace{2pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+\end{document}
