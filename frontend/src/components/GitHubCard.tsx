@@ -13,6 +13,13 @@ import type {
   GitHubRepoFilesResponse,
   GitHubReposResponse,
 } from '../types/integration';
+import {
+  GitBranch,
+  RefreshCw,
+  LogOut,
+  ExternalLink,
+  CheckCircle2,
+} from 'lucide-react';
 
 export function GitHubCard() {
   const { token } = useAuth();
@@ -128,19 +135,31 @@ export function GitHubCard() {
     <section className="integration-card">
       <div className="integration-header">
         <div>
-          <span className="badge">Phase 2 · Step 2</span>
-          <h2>GitHub Integration</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+            <span className="badge-clean">
+              <GitBranch size={13} />
+              GitHub
+            </span>
+          </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+            GitHub Integration
+          </h2>
           <p className="integration-subtitle">
-            Public repository access to discover your coding projects, manifests, and READMEs.
+            Public repository access to discover your coding projects, architectural manifests, and documentation.
           </p>
         </div>
 
         <span className={status?.connected ? 'status-pill connected' : 'status-pill'}>
-          {loadingStatus
-            ? 'Checking...'
-            : status?.connected
-            ? `Connected (@${status.username || 'GitHub'})`
-            : 'Not connected'}
+          {loadingStatus ? (
+            'Checking...'
+          ) : status?.connected ? (
+            <>
+              <CheckCircle2 size={12} />
+              <span>Connected (@{status.username || 'GitHub'})</span>
+            </>
+          ) : (
+            'Not connected'
+          )}
         </span>
       </div>
 
@@ -155,7 +174,8 @@ export function GitHubCard() {
             onClick={handleConnect}
             disabled={loadingStatus}
           >
-            Connect GitHub
+            <GitBranch size={15} />
+            <span>Connect GitHub</span>
           </button>
         ) : (
           <>
@@ -165,14 +185,16 @@ export function GitHubCard() {
               onClick={handleFetchRepos}
               disabled={loadingRepos}
             >
-              {loadingRepos ? 'Fetching Repositories...' : 'Discover Public Repositories'}
+              <RefreshCw size={14} className={loadingRepos ? 'animate-spin' : ''} />
+              <span>{loadingRepos ? 'Fetching Repositories...' : 'Discover Public Repositories'}</span>
             </button>
             <button
               type="button"
               className="btn-secondary"
               onClick={handleDisconnect}
             >
-              Disconnect
+              <LogOut size={14} />
+              <span>Disconnect</span>
             </button>
           </>
         )}
@@ -208,8 +230,10 @@ export function GitHubCard() {
                             target="_blank"
                             rel="noreferrer"
                             className="file-name"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                           >
-                            {repo.full_name}
+                            <span>{repo.full_name}</span>
+                            <ExternalLink size={12} style={{ color: 'var(--text-tertiary)' }} />
                           </a>
                           {repo.is_candidate_relevant && (
                             <span className="relevant-badge">Original Project</span>
@@ -233,17 +257,22 @@ export function GitHubCard() {
 
                       <button
                         type="button"
-                        className="btn-secondary"
+                        className="btn-secondary btn-sm"
                         onClick={() =>
                           handleInspectRepo(repo.owner, repo.name, repo.full_name)
                         }
                         disabled={isInspecting}
                       >
-                        {isInspecting
-                          ? 'Inspecting...'
-                          : inspected
-                          ? 'Hide Files'
-                          : 'Inspect Files'}
+                        {isInspecting ? (
+                          <>
+                            <RefreshCw size={12} className="animate-spin" />
+                            <span>Inspecting...</span>
+                          </>
+                        ) : inspected ? (
+                          'Hide Files'
+                        ) : (
+                          'Inspect Files'
+                        )}
                       </button>
                     </div>
 

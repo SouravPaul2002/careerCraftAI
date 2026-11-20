@@ -111,3 +111,42 @@ async def run_agent_workflow(
         config = {"configurable": {"thread_id": active_thread}}
         result_state = await compiled_graph.ainvoke(initial_state, config=config)
         return result_state
+
+
+async def stream_agent_workflow(
+    user_id: int,
+    job_raw_text: str,
+    hint_title: Optional[str] = None,
+    hint_company: Optional[str] = None,
+    thread_id: Optional[str] = None,
+    human_feedback: Optional[str] = None,
+):
+    """Execute the multi-agent graph with streaming state updates per completed node."""
+    active_thread = thread_id or f"user-{user_id}-{uuid.uuid4().hex[:8]}"
+
+    initial_state: AgentGraphState = {
+        "user_id": user_id,
+        "job_raw_text": job_raw_text,
+        "hint_title": hint_title,
+        "hint_company": hint_company,
+        "job_analysis": None,
+        "candidate_profile": None,
+        "candidate_analysis": None,
+        "supervisor_evaluation": None,
+        "generated_application": None,
+        "application_id": None,
+        "judge_evaluation": None,
+        "revision_count": 0,
+        "human_feedback": human_feedback,
+        "human_approved": False,
+        "status": "in_progress",
+        "errors": [],
+    }
+
+    builder = build_graph()
+
+    async with get_postgres_checkpointer() as checkpointer:
+        compiled_graph = builder.compile(checkpointer=checkpointer)
+        config = {"configurable": {"thread_id": active_thread}}
+        async for chunk in compiled_graph.astream(initial_state, config=config, stream_mode="updates"):
+            yield chunk

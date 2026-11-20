@@ -12,6 +12,19 @@ import type {
   KnowledgeSyncResponse,
   RetrievedChunkItem,
 } from '../types/knowledge';
+import {
+  Database,
+  Cpu,
+  Layers,
+  Clock,
+  Search,
+  Save,
+  Plus,
+  X,
+  ExternalLink,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react';
 
 export function KnowledgeBaseCard() {
   const { token } = useAuth();
@@ -68,7 +81,7 @@ export function KnowledgeBaseCard() {
       const res = await syncKnowledgeBase(token);
       setLastSyncResult(res);
       setNotice(
-        `Sync complete! ${res.synced_items_count} document(s) updated, ${res.skipped_items_count} unchanged (skipped). Total indexed chunks: ${res.total_chunks}.`
+        `Sync complete: ${res.synced_items_count} document(s) updated, ${res.skipped_items_count} unchanged (skipped). Total indexed chunks: ${res.total_chunks}.`
       );
       // Reload updated profile
       const updated = await getCandidateProfile(token);
@@ -97,7 +110,7 @@ export function KnowledgeBaseCard() {
         skills,
       });
       setProfile(updated);
-      setNotice('Candidate profile updated successfully!');
+      setNotice('Candidate profile updated successfully.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
@@ -135,99 +148,145 @@ export function KnowledgeBaseCard() {
   }
 
   return (
-    <section className="integration-card" style={{ marginTop: '1.5rem' }}>
-      <div className="card-header">
+    <section className="surface-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2>Candidate Knowledge Base &amp; RAG</h2>
-          <p className="card-subtitle">
-            Extracts, chunks, and indexes candidate documents &amp; code into ChromaDB with semantic retrieval.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+            <span className="badge-clean">
+              <Database size={13} />
+              RAG &amp; Vector Index
+            </span>
+          </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+            Candidate Knowledge Base
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
+            Indexes selected candidate materials into ChromaDB for high-precision semantic retrieval during job matching.
           </p>
         </div>
+
         <button
-          className="btn-primary"
+          type="button"
+          className="btn-pill"
           onClick={handleSync}
           disabled={syncing || loading}
-          style={{ whiteSpace: 'nowrap' }}
         >
-          {syncing ? 'Syncing...' : 'Sync Knowledge Base'}
+          <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+          <span>{syncing ? 'Syncing index...' : 'Sync Knowledge Base'}</span>
         </button>
       </div>
 
-      {notice && <div className="alert alert-success" style={{ marginTop: '1rem' }}>{notice}</div>}
-      {error && <div className="alert alert-error" style={{ marginTop: '1rem' }}>{error}</div>}
+      {notice && <div className="alert-success">{notice}</div>}
+      {error && <div className="alert-error">{error}</div>}
 
       {/* Sync Status Bar */}
-      <div className="source-summary-row" style={{ marginTop: '1rem' }}>
-        <div className="source-chip active">
-          <strong>Vector Store:</strong> ChromaDB (Local Cosine)
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+        <div className="chip-clean active">
+          <Database size={13} />
+          <span>ChromaDB (Local Cosine)</span>
         </div>
-        <div className="source-chip active">
-          <strong>Embedding Model:</strong> Ollama all-minilm (384d)
+        <div className="chip-clean active">
+          <Cpu size={13} />
+          <span>Embedding: Ollama all-minilm (384d)</span>
         </div>
         {lastSyncResult && (
-          <div className="source-chip">
-            <strong>Total Chunks:</strong> {lastSyncResult.total_chunks}
+          <div className="chip-clean">
+            <Layers size={13} />
+            <span>Indexed chunks: <strong>{lastSyncResult.total_chunks}</strong></span>
           </div>
         )}
-        <div className="source-chip">
-          <strong>Last Synced:</strong>{' '}
-          {profile?.last_synced_at
-            ? new Date(profile.last_synced_at).toLocaleString()
-            : 'Not yet synced'}
+        <div className="chip-clean">
+          <Clock size={13} />
+          <span>
+            Last synced:{' '}
+            {profile?.last_synced_at
+              ? new Date(profile.last_synced_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
+              : 'Not yet synced'}
+          </span>
         </div>
       </div>
 
-      {/* Candidate Profile Editor */}
-      <div className="discovery-sections">
-        <div className="discovery-group">
-          <h3>Structured Candidate Intelligence</h3>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>
-            Extracted automatically by the LLM from your uploaded resumes and repositories, editable at any time.
-          </p>
+      {/* Structured Candidate Intelligence & Semantic Search */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: '1.25rem',
+          marginTop: '0.5rem',
+        }}
+      >
+        {/* Panel 1: Structured Candidate Intelligence */}
+        <div
+          style={{
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--bg-surface)',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <Sparkles size={15} style={{ color: 'var(--text-secondary)' }} />
+              <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Candidate Intelligence
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+              Extracted automatically by the LLM from selected resumes and repositories.
+            </p>
+          </div>
 
-          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.3rem' }}>
+              <label style={{ display: 'block', fontWeight: 500, fontSize: '0.8125rem', marginBottom: '0.35rem', color: 'var(--text-primary)' }}>
                 Professional Headline
               </label>
               <input
                 type="text"
+                className="input-clean"
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
-                placeholder="e.g. Senior Full-Stack Engineer | Python, React, AI"
-                style={{
-                  width: '100%',
-                  padding: '0.6rem 0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                }}
+                placeholder="e.g. Senior Full-Stack Engineer | Python, React, Multi-Agent AI"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.3rem' }}>
+              <label style={{ display: 'block', fontWeight: 500, fontSize: '0.8125rem', marginBottom: '0.35rem', color: 'var(--text-primary)' }}>
                 Executive Summary
               </label>
               <textarea
+                className="textarea-clean"
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 rows={3}
-                placeholder="Brief summary of your professional expertise and strengths..."
-                style={{
-                  width: '100%',
-                  padding: '0.6rem 0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  fontFamily: 'inherit',
-                }}
+                placeholder="Brief summary of professional expertise, strengths, and architecture background..."
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.3rem' }}>
-                Key Skills ({skills.length})
-              </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <label style={{ fontWeight: 500, fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                  Core Competencies &amp; Skills
+                </label>
+                <span className="badge-clean">{skills.length} skills</span>
+              </div>
+
+              {/* Skills pill container */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.4rem',
+                  marginBottom: '0.6rem',
+                  maxHeight: '120px',
+                  overflowY: 'auto',
+                  padding: '0.25rem',
+                }}
+              >
                 {skills.map((skill) => (
                   <span
                     key={skill}
@@ -235,111 +294,113 @@ export function KnowledgeBaseCard() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.35rem',
-                      background: '#eff6ff',
-                      color: '#1e40af',
-                      padding: '0.25rem 0.65rem',
-                      borderRadius: '999px',
-                      fontSize: '0.825rem',
+                      backgroundColor: 'var(--bg-subtle)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-subtle)',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.7813rem',
                       fontWeight: 500,
                     }}
                   >
-                    {skill}
+                    <span>{skill}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
                       style={{
-                        background: 'none',
+                        background: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        color: '#6b7280',
-                        fontWeight: 'bold',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: 'var(--text-tertiary)',
                       }}
+                      title={`Remove ${skill}`}
                     >
-                      &times;
+                      <X size={12} />
                     </button>
                   </span>
                 ))}
               </div>
 
+              {/* Add skill input */}
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <input
                   type="text"
+                  className="input-clean"
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
-                  placeholder="Add skill (e.g. PostgreSQL, Docker)"
+                  placeholder="Add skill (e.g. LangChain, Docker)"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       handleAddSkill();
                     }
                   }}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    fontSize: '0.875rem',
-                  }}
+                  style={{ flex: 1 }}
                 />
                 <button
                   type="button"
+                  className="btn-pill-ghost"
                   onClick={handleAddSkill}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    background: '#f9fafb',
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                  }}
+                  style={{ border: '1px solid var(--border-subtle)', padding: '0.45rem 0.85rem' }}
                 >
-                  Add
+                  <Plus size={14} />
+                  <span>Add</span>
                 </button>
               </div>
             </div>
 
             <button
               type="submit"
-              className="btn-primary"
+              className="btn-pill"
               disabled={savingProfile}
-              style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
+              style={{ alignSelf: 'flex-start', marginTop: '0.4rem' }}
             >
-              {savingProfile ? 'Saving...' : 'Save Profile Changes'}
+              <Save size={14} />
+              <span>{savingProfile ? 'Saving...' : 'Save Profile'}</span>
             </button>
           </form>
         </div>
 
-        {/* Semantic Retrieval Playground */}
-        <div className="discovery-group" style={{ marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>
-          <h3>Semantic Search &amp; RAG Playground</h3>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.85rem' }}>
-            Test semantic vector search across your indexed documents. Retrieved chunks include similarity match score and source provenance.
-          </p>
+        {/* Panel 2: Semantic Retrieval Playground */}
+        <div
+          style={{
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--bg-surface)',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <Search size={15} style={{ color: 'var(--text-secondary)' }} />
+              <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Semantic Search &amp; RAG Playground
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+              Test vector similarity queries against your indexed candidate documents.
+            </p>
+          </div>
 
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem' }}>
             <input
               type="text"
+              className="input-clean"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="e.g. What experience do I have with FastAPI and backend architecture?"
-              style={{
-                flex: 1,
-                padding: '0.6rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #d1d5db',
-                fontSize: '0.875rem',
-              }}
+              placeholder="e.g. Experience with microservices or LLM orchestration?"
+              style={{ flex: 1 }}
             />
             <select
+              className="select-clean"
               value={searchLimit}
               onChange={(e) => setSearchLimit(Number(e.target.value))}
-              style={{
-                padding: '0.6rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #d1d5db',
-                fontSize: '0.875rem',
-                backgroundColor: '#ffffff',
-              }}
             >
               <option value={2}>Top 2</option>
               <option value={4}>Top 4</option>
@@ -347,97 +408,112 @@ export function KnowledgeBaseCard() {
             </select>
             <button
               type="submit"
-              className="btn-primary"
+              className="btn-pill"
               disabled={searching || !searchQuery.trim()}
               style={{ whiteSpace: 'nowrap' }}
             >
-              {searching ? 'Searching...' : 'Search Vectors'}
+              <Search size={14} />
+              <span>{searching ? 'Querying...' : 'Search'}</span>
             </button>
           </form>
 
-          {searchResults && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ fontSize: '0.875rem', color: '#4b5563', fontWeight: 600 }}>
-                Found {searchResults.total_results} relevant chunk(s) for &ldquo;{searchResults.query}&rdquo;:
-              </div>
-
-              {searchResults.chunks.length === 0 ? (
-                <div style={{ color: '#6b7280', fontSize: '0.875rem', fontStyle: 'italic' }}>
-                  No matching chunks found. Sync your documents first to populate the vector store.
+          {/* Contained Scroll Results */}
+          <div style={{ flex: 1 }}>
+            {searchResults && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  Found {searchResults.total_results} chunk(s) for &ldquo;{searchResults.query}&rdquo;:
                 </div>
-              ) : (
-                searchResults.chunks.map((chunk: RetrievedChunkItem) => (
-                  <div
-                    key={chunk.chunk_id}
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '8px',
-                      border: '1px solid #e5e7eb',
-                      background: '#ffffff',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '0.4rem',
-                      }}
-                    >
-                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <span
+
+                {searchResults.chunks.length === 0 ? (
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontStyle: 'italic', padding: '1rem 0' }}>
+                    No matching chunks found. Sync your documents first to populate the vector store.
+                  </div>
+                ) : (
+                  <div className="scroll-viewport" style={{ maxHeight: '320px' }}>
+                    {searchResults.chunks.map((chunk: RetrievedChunkItem) => (
+                      <div
+                        key={chunk.chunk_id}
+                        className="item-card-row"
+                        style={{ flexDirection: 'column', gap: '0.45rem' }}
+                      >
+                        <div
                           style={{
-                            fontSize: '0.725rem',
-                            fontWeight: 700,
-                            padding: '0.15rem 0.45rem',
-                            borderRadius: '4px',
-                            background: chunk.source_type === 'google_drive' ? '#fef3c7' : '#e0f2fe',
-                            color: chunk.source_type === 'google_drive' ? '#92400e' : '#075985',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '100%',
+                            gap: '0.5rem',
                           }}
                         >
-                          {chunk.source_type === 'google_drive' ? 'Drive' : 'GitHub'}
-                        </span>
-                        <strong style={{ fontSize: '0.875rem' }}>{chunk.title}</strong>
-                        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
-                          Chunk {chunk.chunk_index + 1}/{chunk.total_chunks}
-                        </span>
-                      </div>
-                      <span
-                        style={{
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          color: '#059669',
-                          background: '#ecfdf5',
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '999px',
-                        }}
-                      >
-                        Match: {(chunk.score * 100).toFixed(1)}%
-                      </span>
-                    </div>
+                          <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center', minWidth: 0 }}>
+                            <span
+                              className={chunk.source_type === 'google_drive' ? 'badge-accent' : 'badge-highlight'}
+                            >
+                              {chunk.source_type === 'google_drive' ? 'Drive' : 'GitHub'}
+                            </span>
+                            <strong
+                              style={{
+                                fontSize: '0.8438rem',
+                                color: 'var(--text-primary)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {chunk.title}
+                            </strong>
+                            <span style={{ fontSize: '0.7188rem', color: 'var(--text-tertiary)', flexShrink: 0 }}>
+                              Chunk {chunk.chunk_index + 1}/{chunk.total_chunks}
+                            </span>
+                          </div>
 
-                    <p style={{ fontSize: '0.825rem', color: '#374151', whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
-                      {chunk.content}
-                    </p>
+                          <span className="badge-success" style={{ flexShrink: 0 }}>
+                            {(chunk.score * 100).toFixed(1)}% match
+                          </span>
+                        </div>
 
-                    {chunk.url && (
-                      <div style={{ marginTop: '0.4rem' }}>
-                        <a
-                          href={chunk.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ fontSize: '0.75rem', color: '#2563eb' }}
+                        <p
+                          style={{
+                            fontSize: '0.8125rem',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.45,
+                            whiteSpace: 'pre-wrap',
+                            maxHeight: '80px',
+                            overflowY: 'auto',
+                            fontFamily: 'var(--font-sans)',
+                          }}
                         >
-                          View Source &rarr;
-                        </a>
+                          {chunk.content}
+                        </p>
+
+                        {chunk.url && (
+                          <div style={{ alignSelf: 'flex-start' }}>
+                            <a
+                              href={chunk.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                fontSize: '0.75rem',
+                                color: 'var(--text-primary)',
+                                fontWeight: 500,
+                              }}
+                            >
+                              <span>View source</span>
+                              <ExternalLink size={11} />
+                            </a>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
-                ))
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>

@@ -8,6 +8,13 @@ import {
   getGoogleStatus,
 } from '../services/googleDriveService';
 import type { DriveFilesResponse, GoogleConnectionStatus } from '../types/integration';
+import {
+  HardDrive,
+  RefreshCw,
+  LogOut,
+  ExternalLink,
+  CheckCircle2,
+} from 'lucide-react';
 
 function formatFileSize(bytes: number | null): string {
   if (bytes === null) return '-';
@@ -102,19 +109,31 @@ export function GoogleDriveCard() {
     <section className="integration-card">
       <div className="integration-header">
         <div>
-          <span className="badge">Phase 2 · Step 1</span>
-          <h2>Google Drive Integration</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+            <span className="badge-clean">
+              <HardDrive size={13} />
+              Google Drive
+            </span>
+          </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+            Google Drive Integration
+          </h2>
           <p className="integration-subtitle">
-            Read-only access to discover your PDF and DOCX documents.
+            Read-only access to discover your PDF and DOCX resumes, portfolios, and certifications.
           </p>
         </div>
 
         <span className={status?.connected ? 'status-pill connected' : 'status-pill'}>
-          {loadingStatus
-            ? 'Checking...'
-            : status?.connected
-            ? `Connected (${status.email || 'Google'})`
-            : 'Not connected'}
+          {loadingStatus ? (
+            'Checking...'
+          ) : status?.connected ? (
+            <>
+              <CheckCircle2 size={12} />
+              <span>Connected ({status.email || 'Google'})</span>
+            </>
+          ) : (
+            'Not connected'
+          )}
         </span>
       </div>
 
@@ -129,7 +148,8 @@ export function GoogleDriveCard() {
             onClick={handleConnect}
             disabled={loadingStatus}
           >
-            Connect Google Drive
+            <HardDrive size={15} />
+            <span>Connect Google Drive</span>
           </button>
         ) : (
           <>
@@ -139,14 +159,16 @@ export function GoogleDriveCard() {
               onClick={handleFetchFiles}
               disabled={loadingFiles}
             >
-              {loadingFiles ? 'Scanning Drive...' : 'Discover PDF & DOCX Files'}
+              <RefreshCw size={14} className={loadingFiles ? 'animate-spin' : ''} />
+              <span>{loadingFiles ? 'Scanning Drive...' : 'Discover PDF & DOCX Files'}</span>
             </button>
             <button
               type="button"
               className="btn-secondary"
               onClick={handleDisconnect}
             >
-              Disconnect
+              <LogOut size={14} />
+              <span>Disconnect</span>
             </button>
           </>
         )}
@@ -176,8 +198,10 @@ export function GoogleDriveCard() {
                           target="_blank"
                           rel="noreferrer"
                           className="file-name"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                         >
-                          {file.name}
+                          <span>{file.name}</span>
+                          <ExternalLink size={12} style={{ color: 'var(--text-tertiary)' }} />
                         </a>
                       ) : (
                         <span className="file-name">{file.name}</span>
